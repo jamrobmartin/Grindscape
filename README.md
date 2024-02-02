@@ -1,2 +1,8 @@
 # Grindscape
 This is a networked video game learning project. It will attempt to recreate a Runescape themed idle game. 
+
+## Motivation
+I am looking for a project to dip my toes in to several areas of programming. I selected this project because it has networking, it has some game engine elements, but I dont have to get bogged down with graphics or speed intensive gaming. I want to focus a considerable amount of my time on the backend side of gaming, not the front end. This is mostly a learning endeavor, not to create a game that I would ever want to publish. (Not to mention I'm not even sure I could given its resemblance to Runescape. Please don't sue me Jagex! I'm a paying subscriber on my Runescape account and have been for many years!)
+
+## General Idea
+The idea here is to recreate several aspects of the game Runescape, but to do so in the form of an idle game. In the actual game, you would have to repetedly click on different trees to woodcut, and then when your inventory was full, you would have to walk back to a bank to drop inventory off. In this version, you can select that you want to perform woodcutting tasks, and the game will simulate the timing between clicking new trees, and will simulate walking to the bank and back. Eventually as I work through the game development, I may adapt and include some more active playing, as well graphical elements. For the first iteration though, and because almost everything is simply a selection based action, I will simply make my UI a C# winforms app. Again, I may adapt in the future, but my motivations are mostly to experience different aspects of game design, not to make something with the latest and greatest tech.
