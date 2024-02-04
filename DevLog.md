@@ -1,6 +1,41 @@
 # Dev Log
 I want to chronicle my journey throughout this project. This will be a place to compile my thoughts and explain what I'm doing and why I'm doing it.
 
+## Log 2 - Initial Design Considerations
+2/3/24
+
+In the past, I would have just jumped right in and started implementing features. For this project, I want to be a bit more methodical than that. I'm going to start by laying out some initial desing considerations. For starters, I may end up reusing some of this code in the future for different projects/games, so I will try to make my code modular and reusable. Secondly, I like the idea of games having a built in modding capability, so whenever/whereever it makes sense, I'm going to implement public APIs and allow for the community the bandwidth to mod the game how they see fit. And yes, I know right now that there isnt actually a player community to use the APIs. This is more an exercise in thinking and designing with this aspect in mind. 
+
+The first place I'm going to start is working on getting some of the initial server capabilities up and running. Afterall, a client can't do anything if it doesnt have a server to connect to. 
+
+We first need to figure out some essentials in terms of how we organize and structure the server. To do that, lets think about what the server needs to do. The server needs to do several things right off the bat. When the server starts, it needs to start listening for and establishing connections with clients. After the connection is established, the client will need to either register or log in. After a client is logged in and authenitcated, it needs to process actions/requests. While all of this is going on, a primary game simulation needs to be running in the background. This is the main game loop. It simulates everything that goes on in the game world, and reacts to inputs by the clients. The allow for persistence, all of this data needs to be stored in a database. Lastly, I want to be able to see some metrics about how the server is running. This would be a form that displays information such as the state of the server, a list of client connections, etc. 
+
+Keeping all of this in mind, I will use a mixture of multithreading, as well as asynchronous methods. The server will utilize 3 primary threads: 1. The UI Thread; 2. The Game Loop Thread; 3. The Client Manager Thread. 
+
+**UI Thread:**
+
+Handles the user interface and interactions with server administrators or operators.\
+Remains responsive to user input and displays real-time information about the server's status.\
+Updates and displays logs, server statistics, and relevant information to the user.
+
+**Game Loop Thread:**
+
+Simulates and maintains the game state, including game logic and world updates.\
+Runs at a consistent rate to ensure smooth gameplay for connected clients.\
+Receives and processes game-related actions or events from clients and updates the game state accordingly.
+
+**Client Manager Thread:**
+
+Manages client connections, such as accepting incoming connections using a TcpListener.\
+Listens for client requests, receives input from clients, and dispatches these requests to the appropriate systems (e.g., game logic, database).\
+Coordinates communication between clients and other server systems, making asynchronous calls to handle I/O-bound operations.\
+Provides a central point of contact for client-related activities and maintains a list of connected clients.
+
+
+In addition to the three main threads, there will be several "Systems" utilized by the threads. These systems will encapsulate various functions, such as communicating with a database, file IO, debugging/logging. The threads will communicate with these Systems with asynchronous tasks. 
+
+For my first set of commits, I will focus on getting these threads up and running, and will begin to implement some of these systems. 
+
 ## Log 1 - Project Beginnings
 2/3/24 
 
