@@ -1,9 +1,6 @@
-﻿using GrindscapeServer.Threads;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GrindscapeServer.Systems;
+using GrindscapeServer.Threads;
+using System.Diagnostics;
 
 namespace GrindscapeServer.Controller
 {
@@ -11,7 +8,7 @@ namespace GrindscapeServer.Controller
     {
         #region Singleton
         private static readonly Lazy<ServerMasterController> lazyInstance =
-            new Lazy<ServerMasterController>(() => new ServerMasterController());
+            new(() => new ServerMasterController());
 
         // Private constructor to prevent external instantiation
         private ServerMasterController()
@@ -30,18 +27,65 @@ namespace GrindscapeServer.Controller
         {
             // Start the server logic
 
-            // Start GameManagerThread
-            GameManagerThread.Start();
+            try
+            {
+                // Systems
 
-            // Start ClientManagerThread
-            ClientManagerThread.Start();
+                // Logger
+                bool LoggerInitialized = Logger.Instance.Initialize();
+                if (!LoggerInitialized)
+                {
+                    throw new Exception("Logger Failed to Initialize");
+                }
 
-            
+                // Figure out how to turn this off in releases.
+                // Debugging 
+                if (true)
+                {
+                    Logger.Instance.RegisterMessageLoggedEventHandler(WriteLoggedMessagesToDebug);
+                }
+
+                // Threads
+
+                // Start GameManagerThread
+                GameManagerThread.Start();
+
+                // Start ClientManagerThread
+                ClientManagerThread.Start();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+
+
+
+
         }
 
         public void StopServer()
         {
             // Stop the server logic
+
+            try
+            {
+                // Threads
+
+                // Stop GameManagerThread
+                GameManagerThread.Stop();
+
+                // Stop ClientManagerThread
+                ClientManagerThread.Stop();
+
+                // Systems
+
+                // Logger
+                Logger.Instance.Shutdown();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
 
             // Stop GameManagerThread
             GameManagerThread.Stop();
@@ -55,15 +99,27 @@ namespace GrindscapeServer.Controller
 
         #region GameManagerThread
 
-        private GameManagerThread GameManagerThread = new GameManagerThread();
+        private readonly GameManagerThread GameManagerThread = new();
 
         #endregion
 
         #region ClientManagerThread
 
-        private ClientManagerThread ClientManagerThread = new ClientManagerThread();
+        private readonly ClientManagerThread ClientManagerThread = new();
 
         #endregion
+
+        #region Debugging
+
+        private void WriteLoggedMessagesToDebug(object? sender, Logger.LoggerMessageEventArgs e)
+        {
+            Logger.LoggerMessage message = e.Message;
+            string logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{message.LogLevel}] [{message.System}] {message.Message}";
+            Debug.WriteLine(logEntry);
+        }
+
+        #endregion
+
     }
 
 }

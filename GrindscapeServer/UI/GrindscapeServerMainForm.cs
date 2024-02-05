@@ -1,13 +1,4 @@
 ﻿using GrindscapeServer.Controller;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace GrindscapeServer.UI
 {
@@ -18,12 +9,12 @@ namespace GrindscapeServer.UI
             InitializeComponent();
         }
 
-        private void startServerToolStripMenuItem_Click(object sender, EventArgs e)
+        private void StartServerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ServerMasterController.Instance.StartServer();
         }
 
-        private void stopServerToolStripMenuItem_Click(object sender, EventArgs e)
+        private void StopServerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ServerMasterController.Instance.StopServer();
         }

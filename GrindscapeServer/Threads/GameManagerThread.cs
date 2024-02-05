@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GrindscapeServer.Systems;
+
 
 namespace GrindscapeServer.Threads
 {
@@ -11,7 +7,7 @@ namespace GrindscapeServer.Threads
     {
         private Thread thread;
         private bool isRunning;
-        private object lockObject = new object();
+        private readonly object lockObject = new();
 
         public GameManagerThread()
         {
@@ -19,7 +15,7 @@ namespace GrindscapeServer.Threads
             isRunning = false;
         }
 
-        public void Start()
+        public ThreadState Start()
         {
             lock (lockObject)
             {
@@ -28,12 +24,14 @@ namespace GrindscapeServer.Threads
                     isRunning = true;
                     thread = new Thread(GameManagementLoop);
                     thread.Start();
-                    Debug.WriteLine($"GameManagementLoop Started!");
+                    LogMessage(Logger.LogLevel.Info, $"GameManagementLoop Started!");
                 }
             }
+
+            return thread.ThreadState;
         }
 
-        public void Stop()
+        public ThreadState Stop()
         {
             lock (lockObject)
             {
@@ -42,9 +40,11 @@ namespace GrindscapeServer.Threads
                     isRunning = false;
                     // Implement logic to gracefully stop the client manager thread
                     thread.Join(); // Wait for the thread to finish
-                    Debug.WriteLine($"GameManagementLoop Stopped!");
+                    LogMessage(Logger.LogLevel.Info, $"GameManagementLoop Stopped!");
                 }
             }
+
+            return thread.ThreadState;
         }
 
         private void GameManagementLoop()
@@ -56,6 +56,20 @@ namespace GrindscapeServer.Threads
                 Thread.Sleep(1000);
             }
         }
+
+        #region Logging
+
+        // Logger Wrapper
+
+        private readonly string LoggerSystem = "GameManagerThread";
+
+        private void LogMessage(Logger.LogLevel logLevel, string message)
+        {
+            Logger.LoggerMessage loggerMessage = new(logLevel, LoggerSystem, message);
+            Logger.Instance.LogMessage(loggerMessage);
+        }
+
+        #endregion
     }
 
 }
