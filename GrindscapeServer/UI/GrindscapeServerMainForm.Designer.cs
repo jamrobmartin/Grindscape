@@ -72,14 +72,14 @@
             startServerToolStripMenuItem.Name = "startServerToolStripMenuItem";
             startServerToolStripMenuItem.Size = new Size(180, 22);
             startServerToolStripMenuItem.Text = "Start Server()";
-            startServerToolStripMenuItem.Click += startServerToolStripMenuItem_Click;
+            startServerToolStripMenuItem.Click += StartServerToolStripMenuItem_Click;
             // 
             // stopServerToolStripMenuItem
             // 
             stopServerToolStripMenuItem.Name = "stopServerToolStripMenuItem";
             stopServerToolStripMenuItem.Size = new Size(180, 22);
             stopServerToolStripMenuItem.Text = "Stop Server()";
-            stopServerToolStripMenuItem.Click += stopServerToolStripMenuItem_Click;
+            stopServerToolStripMenuItem.Click += StopServerToolStripMenuItem_Click;
             // 
             // GrindscapeServerMainForm
             // 

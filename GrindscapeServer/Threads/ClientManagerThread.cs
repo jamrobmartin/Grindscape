@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GrindscapeServer.Systems;
 
 namespace GrindscapeServer.Threads
 {
@@ -11,7 +6,7 @@ namespace GrindscapeServer.Threads
     {
         private Thread thread;
         private bool isRunning;
-        private object lockObject = new object();
+        private readonly object lockObject = new();
 
         public ClientManagerThread()
         {
@@ -19,7 +14,7 @@ namespace GrindscapeServer.Threads
             isRunning = false;
         }
 
-        public void Start()
+        public ThreadState Start()
         {
             lock (lockObject)
             {
@@ -28,12 +23,14 @@ namespace GrindscapeServer.Threads
                     isRunning = true;
                     thread = new Thread(ClientManagementLoop);
                     thread.Start();
-                    Debug.WriteLine($"ClientManagementLoop Started!");
+                    LogMessage(Logger.LogLevel.Info, $"ClientManagementLoop Started!");
                 }
             }
+
+            return thread.ThreadState;
         }
 
-        public void Stop()
+        public ThreadState Stop()
         {
             lock (lockObject)
             {
@@ -42,9 +39,11 @@ namespace GrindscapeServer.Threads
                     isRunning = false;
                     // Implement logic to gracefully stop the client manager thread
                     thread.Join(); // Wait for the thread to finish
-                    Debug.WriteLine($"ClientManagementLoop Stopped!");
+                    LogMessage(Logger.LogLevel.Info, $"ClientManagementLoop Stopped!");
                 }
             }
+
+            return thread.ThreadState;
         }
 
         private void ClientManagementLoop()
@@ -53,8 +52,23 @@ namespace GrindscapeServer.Threads
             {
                 // Client management logic goes here
                 // This loop continues until isRunning is set to false
+                Thread.Sleep(1000);
             }
         }
+
+        #region Logging
+
+        // Logger Wrapper
+
+        private readonly string LoggerSystem = "ClientManagerThread";
+
+        private void LogMessage(Logger.LogLevel logLevel, string message)
+        {
+            Logger.LoggerMessage loggerMessage = new(logLevel, LoggerSystem, message);
+            Logger.Instance.LogMessage(loggerMessage);
+        }
+
+        #endregion
     }
 
 }
