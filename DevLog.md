@@ -1,6 +1,44 @@
 # Dev Log
 I want to chronicle my journey throughout this project. This will be a place to compile my thoughts and explain what I'm doing and why I'm doing it.
 
+## Log 3 - Custom Logger & Asynchronous Programming
+2/6/24
+
+I figured that the first System that I should set up would be the logging system. This system should be the first system that the server starts during Initialization, and the last system that the server shuts down during Shutdown. Additionally, this system will become incredibly useful to assist with logging errors and debugging. I want the Logger to do two things. First and foremost, it should log messages to a file. This is the primary function of the logger. Secondly though, I wanted to expose a way for the Logger to notify other systems when it logs a message, in case those other systems want to do something with those messages. My initial use case for this is that I want to build in a pseudo console window in to the application itself to see some of the debug messages during development. To accomplish this, the Logger would just need to include a MessageLogged event, and to pass the LoggerMessage to any registered event handlers.
+
+Initially, I wanted to try out asynchronous programming, which is something that I have very little experience with. Originally, I figured that I could make a Logger class that just contained some static methods. Then when a LogMessage call was made, I could write to the file and any event handlers asynchronously. This is where my understanding of asynchronous was lacking. In my head, I was using the word asynchronous to mean "fire and forget". I assumed that I could launch a LogMessage call, and that whatever other system or thread made that call would just fire the function and then continue. That is not how asynchronous works. 
+
+Asynchronous programming works like this. Typically, when you make a function call, you cant do anything else until that function call returns. Asynchronous programming allows you to defer receiving the the return value of that method call until later. Lets create an example. Lets say that I have several chores I need to get done before I can leave the house. Those chores are doing laundry, making a sandwich, putting away the dishes, and then folding the clean clothes. In a synchronous programming model, if I started doing laundry with the DoLaundry() method, I would have to wait until DoLaundry() had finished before I could move on to MakeSandwich(). The pseudocode would look something like this:
+```
+bool laundryFinished = DoLaundry();
+
+bool sandwichMade = MakeSandwich();
+
+if(sandwichMade)
+  PutAwayDishes();
+
+if(laundryFinished)
+  FoldLaundry();
+```
+Obviously you wouldn't want to wait for DoLaundry() to finish before you move on to MakeSandwich(). You would want DoLaundry() to work in the background while you perform the MakeSandwich() and PutAwayDishes() methods. This is where asynchronous programming comes in. It allows you to capture an executing method as a Task, and then get the results of the task later. To update the example code, it would now look like this:
+```
+Task<bool> laundryTask = DoLaundry();
+
+bool sandwichMade = MakeSandwich();
+
+if(sandwichMade)
+  PutAwayDishes();
+
+bool laundryFinished = await laundryTask;
+
+if(laundryFinished)
+  FoldLaundry();
+```
+Now in this version of code, you would start the DoLaundry() task, move on to the MakeSandwich() and PutAwayDishes() methods, and then wait for the laundryTask to finish before proceeding. 
+
+Asynchronous can be really powerful and can save a lot of executing time if used correctly. The problem with what I was trying to do was that I wanted to call the LogMessage() method, and then continue with whatever else I was doing, but never wait for the task to finish. That is not how you are supposed to use asynchronous programming. After consulting the oracle, I decided that what I really wanted was to have a queue of messages, and when I wanted a system to log a message, all that that method would do is add the message to the queue, instead of waiting for the message to be written to the file and to all of the event handlers. I would then simply create a background thread that would continually check the queue for messages, and the background thread would write the messages to the file and to the event handlers. Its not so much that I was implementing a "fire and forget" pattern, it was more so that I was implementing a "hand off to someone else" pattern. This seemed to work well and accomplish what I was looking for!
+
+
 ## Log 2 - Initial Design Considerations
 2/3/24
 
