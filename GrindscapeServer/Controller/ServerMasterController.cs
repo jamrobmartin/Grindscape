@@ -38,12 +38,6 @@ namespace GrindscapeServer.Controller
                     throw new Exception("Logger Failed to Initialize");
                 }
 
-                // Figure out how to turn this off in releases.
-                // Debugging 
-                if (true)
-                {
-                    Logger.Instance.RegisterMessageLoggedEventHandler(WriteLoggedMessagesToDebug);
-                }
 
                 // Threads
 
@@ -87,11 +81,6 @@ namespace GrindscapeServer.Controller
                 Debug.WriteLine(ex.Message);
             }
 
-            // Stop GameManagerThread
-            GameManagerThread.Stop();
-
-            // Stop ClientManagerThread
-            ClientManagerThread.Stop();
         }
 
         // Add more methods as needed for server-level operations
@@ -111,6 +100,7 @@ namespace GrindscapeServer.Controller
 
         #region Debugging
 
+        // This event handler isnt used currently because we have instantiated a LoggerConsole user control in the main form to see LoggerMessages
         private void WriteLoggedMessagesToDebug(object? sender, Logger.LoggerMessageEventArgs e)
         {
             Logger.LoggerMessage message = e.Message;

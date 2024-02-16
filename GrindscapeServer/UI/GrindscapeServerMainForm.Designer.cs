@@ -34,7 +34,10 @@
             serverToolStripMenuItem = new ToolStripMenuItem();
             startServerToolStripMenuItem = new ToolStripMenuItem();
             stopServerToolStripMenuItem = new ToolStripMenuItem();
+            tableLayoutPanel1 = new TableLayoutPanel();
+            loggerConsole1 = new LoggerConsole();
             menuStrip1.SuspendLayout();
+            tableLayoutPanel1.SuspendLayout();
             SuspendLayout();
             // 
             // statusStrip1
@@ -70,22 +73,45 @@
             // startServerToolStripMenuItem
             // 
             startServerToolStripMenuItem.Name = "startServerToolStripMenuItem";
-            startServerToolStripMenuItem.Size = new Size(180, 22);
+            startServerToolStripMenuItem.Size = new Size(141, 22);
             startServerToolStripMenuItem.Text = "Start Server()";
             startServerToolStripMenuItem.Click += StartServerToolStripMenuItem_Click;
             // 
             // stopServerToolStripMenuItem
             // 
             stopServerToolStripMenuItem.Name = "stopServerToolStripMenuItem";
-            stopServerToolStripMenuItem.Size = new Size(180, 22);
+            stopServerToolStripMenuItem.Size = new Size(141, 22);
             stopServerToolStripMenuItem.Text = "Stop Server()";
             stopServerToolStripMenuItem.Click += StopServerToolStripMenuItem_Click;
+            // 
+            // tableLayoutPanel1
+            // 
+            tableLayoutPanel1.ColumnCount = 2;
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel1.Controls.Add(loggerConsole1, 0, 0);
+            tableLayoutPanel1.Dock = DockStyle.Fill;
+            tableLayoutPanel1.Location = new Point(0, 24);
+            tableLayoutPanel1.Name = "tableLayoutPanel1";
+            tableLayoutPanel1.RowCount = 1;
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel1.Size = new Size(1556, 912);
+            tableLayoutPanel1.TabIndex = 2;
+            // 
+            // loggerConsole1
+            // 
+            loggerConsole1.Dock = DockStyle.Fill;
+            loggerConsole1.Location = new Point(3, 3);
+            loggerConsole1.Name = "loggerConsole1";
+            loggerConsole1.Size = new Size(772, 906);
+            loggerConsole1.TabIndex = 0;
             // 
             // GrindscapeServerMainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1556, 958);
+            Controls.Add(tableLayoutPanel1);
             Controls.Add(statusStrip1);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
@@ -95,6 +121,7 @@
             FormClosing += GrindscapeServerMainForm_FormClosing;
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
+            tableLayoutPanel1.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -107,5 +134,7 @@
         private ToolStripMenuItem serverToolStripMenuItem;
         private ToolStripMenuItem startServerToolStripMenuItem;
         private ToolStripMenuItem stopServerToolStripMenuItem;
+        private TableLayoutPanel tableLayoutPanel1;
+        private LoggerConsole loggerConsole1;
     }
 }

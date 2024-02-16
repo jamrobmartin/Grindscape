@@ -7,6 +7,8 @@ namespace GrindscapeServer.UI
         public GrindscapeServerMainForm()
         {
             InitializeComponent();
+
+            Systems.Logger.Instance.RegisterMessageLoggedEventHandler(loggerConsole1.WriteLoggedMessagesToLoggerConsole);
         }
 
         private void StartServerToolStripMenuItem_Click(object sender, EventArgs e)

@@ -59,7 +59,8 @@ namespace GrindscapeServer.Systems
         #region Fields and Properties
         private readonly ConcurrentQueue<LoggerMessage> logQueue = new();
         private string LogFilePath = "log_default.txt";
-        private readonly CancellationTokenSource cancellationTokenSource = new();
+        private CancellationTokenSource? cancellationTokenSource;
+        private Task? LoggerLoopTask;
 
         public bool Initialized { get; private set; } = false;
 
@@ -70,8 +71,7 @@ namespace GrindscapeServer.Systems
         // Private constructor to prevent external instantiation
         private Logger()
         {
-            // Start a background task to handle logging
-            Task.Factory.StartNew(LogMessageLoop, cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+
         }
 
         #endregion
@@ -94,7 +94,48 @@ namespace GrindscapeServer.Systems
                     Initialized = true;
                 }
 
+                cancellationTokenSource = new();
+                // Start a background task to handle logging
+                LoggerLoopTask = Task.Factory.StartNew(LogMessageLoop, cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
+                // Figure out how to turn this off in releases.
+                // Debugging 
+                if (true)
+                {
+                    //Logger.Instance.RegisterMessageLoggedEventHandler(WriteLoggedMessagesToDebug);
+
+                    Logger.LoggerMessage message1 = new()
+                    {
+                        Message = "Test!",
+                        System = "ServerMasterController",
+                        LogLevel = Logger.LogLevel.Debug
+                    };
+                    Logger.Instance.LogMessage(message1);
+
+                    Logger.LoggerMessage message2 = new()
+                    {
+                        Message = "Test!",
+                        System = "ServerMasterController",
+                        LogLevel = Logger.LogLevel.Info
+                    };
+                    Logger.Instance.LogMessage(message2);
+
+                    Logger.LoggerMessage message3 = new()
+                    {
+                        Message = "Test!",
+                        System = "ServerMasterController",
+                        LogLevel = Logger.LogLevel.Warning
+                    };
+                    Logger.Instance.LogMessage(message3);
+
+                    Logger.LoggerMessage message4 = new()
+                    {
+                        Message = "Test!",
+                        System = "ServerMasterController",
+                        LogLevel = Logger.LogLevel.Error
+                    };
+                    Logger.Instance.LogMessage(message4);
+                }
             }
 
             return Initialized;
@@ -106,10 +147,33 @@ namespace GrindscapeServer.Systems
             logQueue.Enqueue(message);
         }
 
-        public void Shutdown()
+        public async void Shutdown()
         {
-            // Signal the background task to stop and wait for it to complete
-            cancellationTokenSource.Cancel();
+            if (Initialized)
+            {
+                Initialized = false;
+
+                // Signal the background task to stop and wait for it to complete
+                cancellationTokenSource?.Cancel();
+
+                if (LoggerLoopTask != null)
+                    await LoggerLoopTask;
+
+                // Flush any remaining messages
+                while (logQueue.TryDequeue(out var message))
+                {
+                    // Log the message to the log file
+                    await LogMessageToFileAsync(message);
+
+                    // Notify any MessageLogged Event Handlers
+                    LoggerMessageEventArgs e = new(message);
+                    await NotifyMessageLoggedEventHandlers(e);
+
+                }
+
+            }
+
+
         }
 
         #endregion
@@ -117,6 +181,9 @@ namespace GrindscapeServer.Systems
         #region Private Methods
         private async void LogMessageLoop()
         {
+            if (cancellationTokenSource == null)
+                return;
+
             while (!cancellationTokenSource.Token.IsCancellationRequested)
             {
                 // The while statement will start by checking if a cancellation has been requested.
