@@ -1,6 +1,76 @@
 # Dev Log
 I want to chronicle my journey throughout this project. This will be a place to compile my thoughts and explain what I'm doing and why I'm doing it.
 
+## Log 4 - System Management
+2/17/24
+
+After I got the Logger System up and running, I started to turn my attention towards implementing the next system. Before getting too far however, I wanted to make sure we had a good basis for System management. In order to create some standardization, I decided that utilizing an ISystem interface for all of the systems would be a good idea. An interface is really only supposed to define the aspects of a class that other classes need to know, and as such is inherently lightweight. I didnt want to put too much detail in to this, because each of the systems will end up being considerably different from each other. This was another factor in deciding to start with an interface, as opposed to an abstract class.
+
+For the interface, I wanted to define two things: Some fields to capture basic info about the System, and some methods used in the control and deployment of all systems. This is what the interface looks like right now:
+```
+public interface ISystem
+{
+    string SystemName { get; }
+    ESystemType SystemType { get; }
+    ESystemStatus SystemStatus { get; }
+    event EventHandler<SystemStatusChangedEventArgs> SystemStatusChanged;
+
+    ManualResetEvent SystemShutdownEvent { get; }
+
+    void InitializeSystem();
+    void StartSystem();
+    void StopSystem();
+
+    void UpdateSystemState();
+}
+```
+I ended up defining a few more things, but each of those extra thigns is in support of the main purpose of the interface. The SystemStatusChanged Event is an event that gets fired when the SystemStatus changes. The SystemShutdownEvent is an event that can be querried to know if a system has finished shutting down or not. And lastly the UpdateSystemState exposed a public method that will make sure the SystemStatus is accurate.
+
+Now that we have a common interface for systems designated, we can more efficently manage the various Systems from the ServerMasterController. First, we want to create a master list of all of the Systems. We add systems to that list from the Initialize method. The order that we add systems to the list matters however. The Systems will get started in the order they are added to the list, and they will be stopped in the reverse order. I'm not confident that this will always be the case, but at least for where I'm at on this project currently, that flow made sense to me. Once the Systems are added to the list, it because trivial to iterate over the list and call Start or Stop.
+
+```
+public void Initialize()
+{
+    if (!Initialized)
+    {
+        // Always add the logger first
+        AddSystem(Logger.Instance);
+
+        // The ClientManager relies on data from the GameManager
+        // You need to add the GameManager before the ClientManager
+        AddSystem(GameManager);
+        AddSystem(ClientManager);
+
+        Initialized = true;
+    }
+}
+
+// Start all Systems 
+public void StartServer()
+{
+    // Start each system in the order it was added to the MasterSystemList
+    foreach (var system in MasterSystemList)
+    {
+        system.StartSystem();
+    }
+}
+
+// Stop all Systems 
+public void StopServer()
+{
+    // Stop each system in the reverse order it was added to the MasterSystemList
+    foreach (var system in MasterSystemList.Reverse<ISystem>())
+    {
+        system.StopSystem();
+    }
+}
+```
+You may have noticed that in the Initialize method, we use both a singleton, as well as class instances when adding to the list. Because the ISystem interface doesnt care what you are, we are able to do this!
+
+The last thing to do was to create a UI element to report all of these details. I created a simple user control that contains a table layout panel with 3 columns, one for each of the fields associated with each system. Because I dont know how many systems I may end up having, I needed this user control to be able to dynamically add Systems to it. The base user control doesnt actually display anything until someone calls the control's AddSystem() method. When this method is called, it creates a new row in the table layout, creates a label to put in each of the columns, and then registers an eventhandler to the systems SystemStatusChanged event.
+
+Now we can start our server, and see the status of each of our 3 systems so far!
+
 ## Log 3 - Custom Logger & Asynchronous Programming
 2/6/24
 
