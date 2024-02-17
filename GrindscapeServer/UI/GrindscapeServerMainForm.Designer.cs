@@ -36,6 +36,7 @@
             stopServerToolStripMenuItem = new ToolStripMenuItem();
             tableLayoutPanel1 = new TableLayoutPanel();
             loggerConsole1 = new LoggerConsole();
+            systemStatusWindow1 = new SystemStatusWindow();
             menuStrip1.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             SuspendLayout();
@@ -86,15 +87,17 @@
             // 
             // tableLayoutPanel1
             // 
-            tableLayoutPanel1.ColumnCount = 2;
+            tableLayoutPanel1.ColumnCount = 3;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel1.Controls.Add(loggerConsole1, 0, 0);
+            tableLayoutPanel1.Controls.Add(systemStatusWindow1, 2, 0);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 24);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.Size = new Size(1556, 912);
             tableLayoutPanel1.TabIndex = 2;
             // 
@@ -105,6 +108,14 @@
             loggerConsole1.Name = "loggerConsole1";
             loggerConsole1.Size = new Size(772, 906);
             loggerConsole1.TabIndex = 0;
+            // 
+            // systemStatusWindow1
+            // 
+            systemStatusWindow1.Dock = DockStyle.Fill;
+            systemStatusWindow1.Location = new Point(1247, 3);
+            systemStatusWindow1.Name = "systemStatusWindow1";
+            systemStatusWindow1.Size = new Size(306, 906);
+            systemStatusWindow1.TabIndex = 1;
             // 
             // GrindscapeServerMainForm
             // 
@@ -136,5 +147,6 @@
         private ToolStripMenuItem stopServerToolStripMenuItem;
         private TableLayoutPanel tableLayoutPanel1;
         private LoggerConsole loggerConsole1;
+        private SystemStatusWindow systemStatusWindow1;
     }
 }
