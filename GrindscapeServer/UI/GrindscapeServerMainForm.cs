@@ -8,6 +8,10 @@ namespace GrindscapeServer.UI
         {
             InitializeComponent();
 
+            ServerMasterController.Instance.Initialize();
+
+            ServerMasterController.Instance.SetSystemStatusWindow(this.systemStatusWindow1);
+
             Systems.Logger.Instance.RegisterMessageLoggedEventHandler(loggerConsole1.WriteLoggedMessagesToLoggerConsole);
         }
 
@@ -21,9 +25,18 @@ namespace GrindscapeServer.UI
             ServerMasterController.Instance.StopServer();
         }
 
-        private void GrindscapeServerMainForm_FormClosing(object sender, FormClosingEventArgs e)
+        private async void GrindscapeServerMainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // We are closing so we no longer need to write to the LoggerConsole...
+            Systems.Logger.Instance.UnRegisterMessageLoggedEventHandler(loggerConsole1.WriteLoggedMessagesToLoggerConsole);
+
+            // Make the call to stop the server.
             ServerMasterController.Instance.StopServer();
+
+            // Start a task to wait until all Systems are shutdown.
+            await Task.Run(() => { ServerMasterController.Instance.WaitUntilAllSystemShutdown(); });
+
+
         }
     }
 }

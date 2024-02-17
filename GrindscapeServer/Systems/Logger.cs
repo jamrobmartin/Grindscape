@@ -4,8 +4,64 @@ using System.Diagnostics;
 
 namespace GrindscapeServer.Systems
 {
-    public class Logger
+    public class Logger : ISystem
     {
+        #region SystemInterface
+        public string SystemName => "Logger";
+
+        public ESystemType SystemType => ESystemType.Singleton;
+
+        private ESystemStatus _systemStatus = ESystemStatus.Uninitialized;
+        public ESystemStatus SystemStatus
+        {
+            get => _systemStatus;
+            set
+            {
+                if (_systemStatus != value)
+                {
+                    _systemStatus = value;
+                    OnSystemStatusChanged(new SystemStatusChangedEventArgs(value));
+                }
+            }
+        }
+
+        public event EventHandler<SystemStatusChangedEventArgs>? SystemStatusChanged;
+
+        protected virtual void OnSystemStatusChanged(SystemStatusChangedEventArgs e)
+        {
+            SystemStatusChanged?.Invoke(this, e);
+        }
+
+        public ManualResetEvent SystemShutdownEvent { get; set; } = new ManualResetEvent(false);
+
+        public void InitializeSystem()
+        {
+
+        }
+
+        public void StartSystem()
+        {
+            Initialize();
+        }
+
+        public void StopSystem()
+        {
+            SystemShutdownEvent.Reset();
+            _ = ShutdownAsync();
+        }
+
+        public void UpdateSystemState()
+        {
+
+            SystemStatus = Initialized ? ESystemStatus.Initialized : ESystemStatus.Uninitialized;
+
+            if (SystemStatus == ESystemStatus.Uninitialized)
+            {
+                SystemShutdownEvent.Set();
+            }
+        }
+        #endregion
+
         #region Logger Message
         public enum LogLevel
         {
@@ -48,6 +104,11 @@ namespace GrindscapeServer.Systems
         public void RegisterMessageLoggedEventHandler(EventHandler<LoggerMessageEventArgs> handler)
         {
             MessageLogged += handler;
+        }
+
+        public void UnRegisterMessageLoggedEventHandler(EventHandler<LoggerMessageEventArgs> handler)
+        {
+            MessageLogged -= handler;
         }
         #endregion
 
@@ -138,6 +199,8 @@ namespace GrindscapeServer.Systems
                 }
             }
 
+            UpdateSystemState();
+
             return Initialized;
         }
 
@@ -147,7 +210,7 @@ namespace GrindscapeServer.Systems
             logQueue.Enqueue(message);
         }
 
-        public async void Shutdown()
+        public async Task ShutdownAsync()
         {
             if (Initialized)
             {
@@ -168,12 +231,10 @@ namespace GrindscapeServer.Systems
                     // Notify any MessageLogged Event Handlers
                     LoggerMessageEventArgs e = new(message);
                     await NotifyMessageLoggedEventHandlers(e);
-
                 }
-
             }
 
-
+            UpdateSystemState();
         }
 
         #endregion

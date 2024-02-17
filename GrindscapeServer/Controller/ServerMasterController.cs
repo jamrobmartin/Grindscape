@@ -1,6 +1,5 @@
 ﻿using GrindscapeServer.Systems;
-using GrindscapeServer.Threads;
-using System.Diagnostics;
+using GrindscapeServer.UI;
 
 namespace GrindscapeServer.Controller
 {
@@ -13,7 +12,7 @@ namespace GrindscapeServer.Controller
         // Private constructor to prevent external instantiation
         private ServerMasterController()
         {
-            // Initialize the controller
+
         }
 
         // Public static property to get the instance
@@ -21,91 +20,100 @@ namespace GrindscapeServer.Controller
 
         #endregion
 
+        #region Private Fields
+
+        // System Threads
+        private readonly GameManager GameManager = new();
+        private readonly ClientManager ClientManager = new();
+
+        #endregion
+
+        #region Public Fields
+        public bool Initialized { get; private set; } = false;
+        #endregion
+
         #region Public Methods
         // Public methods to handle server-level operations
-        public void StartServer()
+
+        // Initialize the ServerMasterController
+        public void Initialize()
         {
-            // Start the server logic
-
-            try
+            if (!Initialized)
             {
-                // Systems
+                // Add all of the Systems
 
-                // Logger
-                bool LoggerInitialized = Logger.Instance.Initialize();
-                if (!LoggerInitialized)
-                {
-                    throw new Exception("Logger Failed to Initialize");
-                }
+                // Each System needs to implement ISystem interface
+                // The order you add the systems is the order in which they will be started.
+                // Make sure to add systems that depend on other sytems AFTER the system they depend on
 
+                // Always add the logger first
+                AddSystem(Logger.Instance);
 
-                // Threads
+                // The ClientManager relies on data from the GameManager
+                // You need to add the GameManager before the ClientManager
+                AddSystem(GameManager);
+                AddSystem(ClientManager);
 
-                // Start GameManagerThread
-                GameManagerThread.Start();
-
-                // Start ClientManagerThread
-                ClientManagerThread.Start();
+                Initialized = true;
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-            }
-
-
-
-
         }
 
+        // Start all Systems 
+        public void StartServer()
+        {
+            // Start each system in the order it was added to the MasterSystemList
+            foreach (var system in MasterSystemList)
+            {
+                system.StartSystem();
+                // Display results of start call...
+            }
+        }
+
+        // Stop all Systems 
         public void StopServer()
         {
-            // Stop the server logic
-
-            try
+            // Stop each system in the reverse order it was added to the MasterSystemList
+            foreach (var system in MasterSystemList.Reverse<ISystem>())
             {
-                // Threads
-
-                // Stop GameManagerThread
-                GameManagerThread.Stop();
-
-                // Stop ClientManagerThread
-                ClientManagerThread.Stop();
-
-                // Systems
-
-                // Logger
-                Logger.Instance.Shutdown();
+                system.StopSystem();
+                // Display results of stop call...
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-            }
-
         }
 
         // Add more methods as needed for server-level operations
         #endregion
 
-        #region GameManagerThread
+        #region SystemStatus
 
-        private readonly GameManagerThread GameManagerThread = new();
+        private SystemStatusWindow? SystemStatusWindow { get; set; }
 
-        #endregion
-
-        #region ClientManagerThread
-
-        private readonly ClientManagerThread ClientManagerThread = new();
-
-        #endregion
-
-        #region Debugging
-
-        // This event handler isnt used currently because we have instantiated a LoggerConsole user control in the main form to see LoggerMessages
-        private void WriteLoggedMessagesToDebug(object? sender, Logger.LoggerMessageEventArgs e)
+        public void SetSystemStatusWindow(SystemStatusWindow window)
         {
-            Logger.LoggerMessage message = e.Message;
-            string logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{message.LogLevel}] [{message.System}] {message.Message}";
-            Debug.WriteLine(logEntry);
+            SystemStatusWindow = window;
+
+            // For all of the systems
+            foreach (var system in MasterSystemList)
+            {
+                // Add the System to the SystemStatusWindow
+                SystemStatusWindow.AddSystem(system);
+            }
+        }
+
+        private List<ISystem> MasterSystemList { get; set; } = [];
+
+        private void AddSystem(ISystem system)
+        {
+            // Add the System to the MasterSystemList
+            MasterSystemList.Add(system);
+
+        }
+
+        public void WaitUntilAllSystemShutdown()
+        {
+            foreach (var system in MasterSystemList.Reverse<ISystem>())
+            {
+                system.SystemShutdownEvent.WaitOne();
+            }
         }
 
         #endregion
