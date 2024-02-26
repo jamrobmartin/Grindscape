@@ -24,7 +24,6 @@ namespace GrindscapeServer.Controller
 
         // System Threads
         private readonly GameManager GameManager = new();
-        private readonly ClientManager ClientManager = new();
 
         #endregion
 
@@ -100,11 +99,15 @@ namespace GrindscapeServer.Controller
         }
 
         private List<ISystem> MasterSystemList { get; set; } = [];
+        public HashSet<string> MasterSystemListNames { get; private set; } = [];
 
         private void AddSystem(ISystem system)
         {
             // Add the System to the MasterSystemList
             MasterSystemList.Add(system);
+
+            // Add the System Name to the HashSet
+            MasterSystemListNames.Add(system.SystemName);
 
         }
 
@@ -116,6 +119,19 @@ namespace GrindscapeServer.Controller
             }
         }
 
+        #endregion
+
+        #region ClientManager
+        private readonly ClientManager ClientManager = new();
+        private ClientStatusWindow? ClientStatusWindow { get; set; }
+
+        public void SetClientStatusWindow(ClientStatusWindow window)
+        {
+            ClientStatusWindow = window;
+
+            ClientManager.ClientAdded += ClientStatusWindow.ClientAddedEventHandler;
+
+        }
         #endregion
 
     }

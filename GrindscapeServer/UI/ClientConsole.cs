@@ -3,11 +3,12 @@ using GrindscapeServer.Systems;
 
 namespace GrindscapeServer.UI
 {
-    public partial class LoggerConsole : UserControl
+    public partial class ClientConsole : UserControl
     {
-        public LoggerConsole()
+        public ClientConsole()
         {
             InitializeComponent();
+
             UpdateButtons();
         }
 
@@ -92,7 +93,7 @@ namespace GrindscapeServer.UI
 
             int logLevelPadding = "[Warning]".Length;
 
-            if (isSystemMessage && isUnderThreshold)
+            if (!isSystemMessage && isUnderThreshold)
             {
                 string logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {("[" + message.LogLevel + "]").PadRight(logLevelPadding)} [{message.System}] {message.Message}";
                 LogLine(logEntry, message.LogLevel);
@@ -102,40 +103,54 @@ namespace GrindscapeServer.UI
 
         private void LogLine(string message, Logger.LogLevel logLevel)
         {
-            if (richTextBox1.InvokeRequired)
+            try
             {
-                void action() { LogLine(message, logLevel); }
-                richTextBox1.Invoke(action);
-            }
-            else
-            {
-                Color textColor = Color.White;
-                switch (logLevel)
+                if (!richTextBox1.IsDisposed)
                 {
-                    case Logger.LogLevel.Debug:
-                        textColor = Color.Blue;
-                        break;
-                    case Logger.LogLevel.Info:
-                        textColor = Color.Lime;
-                        break;
-                    case Logger.LogLevel.Warning:
-                        textColor = Color.Yellow;
-                        break;
-                    case Logger.LogLevel.Error:
-                        textColor = Color.Red;
-                        break;
-                    default:
-                        break;
+
+                    if (richTextBox1.InvokeRequired && !richTextBox1.IsDisposed)
+                    {
+                        void action() { LogLine(message, logLevel); }
+                        richTextBox1.Invoke(action);
+                    }
+                    else
+                    {
+                        Color textColor = Color.White;
+                        switch (logLevel)
+                        {
+                            case Logger.LogLevel.Debug:
+                                textColor = Color.Blue;
+                                break;
+                            case Logger.LogLevel.Info:
+                                textColor = Color.Lime;
+                                break;
+                            case Logger.LogLevel.Warning:
+                                textColor = Color.Yellow;
+                                break;
+                            case Logger.LogLevel.Error:
+                                textColor = Color.Red;
+                                break;
+                            default:
+                                break;
+                        }
+
+                        richTextBox1.SelectionStart = richTextBox1.TextLength;
+                        richTextBox1.SelectionLength = 0;
+                        richTextBox1.SelectionColor = textColor;
+                        richTextBox1.AppendText(message + Environment.NewLine);
+                        richTextBox1.SelectionColor = textColor;
+
+                        richTextBox1.ScrollToCaret();
+                    }
                 }
-
-                richTextBox1.SelectionStart = richTextBox1.TextLength;
-                richTextBox1.SelectionLength = 0;
-                richTextBox1.SelectionColor = textColor;
-                richTextBox1.AppendText(message + Environment.NewLine);
-                richTextBox1.SelectionColor = textColor;
-
-                richTextBox1.ScrollToCaret();
             }
+            catch (Exception)
+            {
+                // This is to catch the object disposed exception
+                
+            }
+
+
         }
     }
 }

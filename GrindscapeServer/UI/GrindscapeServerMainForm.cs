@@ -12,7 +12,11 @@ namespace GrindscapeServer.UI
 
             ServerMasterController.Instance.SetSystemStatusWindow(this.systemStatusWindow1);
 
+            ServerMasterController.Instance.SetClientStatusWindow(this.clientStatusWindow1);
+
             Systems.Logger.Instance.RegisterMessageLoggedEventHandler(loggerConsole1.WriteLoggedMessagesToLoggerConsole);
+            Systems.Logger.Instance.RegisterMessageLoggedEventHandler(clientConsole1.WriteLoggedMessagesToLoggerConsole);
+
         }
 
         private void StartServerToolStripMenuItem_Click(object sender, EventArgs e)
