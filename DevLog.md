@@ -1,6 +1,11 @@
 # Dev Log
 I want to chronicle my journey throughout this project. This will be a place to compile my thoughts and explain what I'm doing and why I'm doing it.
 
+## Log 5 - Client Connections
+XX/YY/XX
+
+Add content here. I know I need to write this and keep up with it, but I'm in a groove right now so I'm trying to get a jump on the next section!
+
 ## Log 4 - System Management
 2/17/24
 
