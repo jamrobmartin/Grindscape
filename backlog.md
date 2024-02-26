@@ -4,12 +4,12 @@ This isnt a true backlog. Its more like a running list of aspects of the game th
 # Server Side:
 ## Server Setup:
 
- [ ]Create a server application using C#.\
- [ ]Set up a TCP listener to accept incoming client connections.\
+ [X]Create a server application using C#.\
+ [X]Set up a TCP listener to accept incoming client connections.\
 ## Client Management:
 
- [ ]Implement a data structure (e.g., list) to manage connected clients.\
- [ ]Handle client connections and disconnections.\
+ [X]Implement a data structure (e.g., list) to manage connected clients.\
+ [X]Handle client connections and disconnections.\
 ## Database Integration:
 
  [ ]Choose and set up a database system (e.g., SQL Server, SQLite).\
