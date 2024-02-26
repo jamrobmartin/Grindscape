@@ -163,12 +163,12 @@ namespace GrindscapeServer.Systems
                 // Debugging 
                 if (true)
                 {
-                    //Logger.Instance.RegisterMessageLoggedEventHandler(WriteLoggedMessagesToDebug);
-
+                    // First we send 4 test messages that should get displayed on the System Logger
+                    
                     Logger.LoggerMessage message1 = new()
                     {
                         Message = "Test!",
-                        System = "ServerMasterController",
+                        System = SystemName,
                         LogLevel = Logger.LogLevel.Debug
                     };
                     Logger.Instance.LogMessage(message1);
@@ -176,7 +176,7 @@ namespace GrindscapeServer.Systems
                     Logger.LoggerMessage message2 = new()
                     {
                         Message = "Test!",
-                        System = "ServerMasterController",
+                        System = SystemName,
                         LogLevel = Logger.LogLevel.Info
                     };
                     Logger.Instance.LogMessage(message2);
@@ -184,7 +184,7 @@ namespace GrindscapeServer.Systems
                     Logger.LoggerMessage message3 = new()
                     {
                         Message = "Test!",
-                        System = "ServerMasterController",
+                        System = SystemName,
                         LogLevel = Logger.LogLevel.Warning
                     };
                     Logger.Instance.LogMessage(message3);
@@ -192,10 +192,44 @@ namespace GrindscapeServer.Systems
                     Logger.LoggerMessage message4 = new()
                     {
                         Message = "Test!",
-                        System = "ServerMasterController",
+                        System = SystemName,
                         LogLevel = Logger.LogLevel.Error
                     };
                     Logger.Instance.LogMessage(message4);
+
+                    // Then we send 4 test messages that should get displayed on the Client Logger
+
+                    Logger.LoggerMessage message5 = new()
+                    {
+                        Message = "Test!",
+                        System = "ClientConsole",
+                        LogLevel = Logger.LogLevel.Debug
+                    };
+                    Logger.Instance.LogMessage(message5);
+
+                    Logger.LoggerMessage message6 = new()
+                    {
+                        Message = "Test!",
+                        System = "ClientConsole",
+                        LogLevel = Logger.LogLevel.Info
+                    };
+                    Logger.Instance.LogMessage(message6);
+
+                    Logger.LoggerMessage message7 = new()
+                    {
+                        Message = "Test!",
+                        System = "ClientConsole",
+                        LogLevel = Logger.LogLevel.Warning
+                    };
+                    Logger.Instance.LogMessage(message7);
+
+                    Logger.LoggerMessage message8 = new()
+                    {
+                        Message = "Test!",
+                        System = "ClientConsole",
+                        LogLevel = Logger.LogLevel.Error
+                    };
+                    Logger.Instance.LogMessage(message8);
                 }
             }
 
