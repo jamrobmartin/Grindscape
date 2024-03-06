@@ -35,29 +35,49 @@ namespace GrindscapeServer.Controller
         // Public methods to handle server-level operations
 
         // Initialize the ServerMasterController
+        // Called when the application starts
+        // This should only get called once per application run
         public void Initialize()
         {
             if (!Initialized)
             {
-                // Add all of the Systems
+                // First add all of the systems. 
+                AddSystems();
 
-                // Each System needs to implement ISystem interface
-                // The order you add the systems is the order in which they will be started.
-                // Make sure to add systems that depend on other sytems AFTER the system they depend on
-
-                // Always add the logger first
-                AddSystem(Logger.Instance);
-
-                // The ClientManager relies on data from the GameManager
-                // You need to add the GameManager before the ClientManager
-                AddSystem(GameManager);
-                AddSystem(ClientManager);
+                // Start each system in the order it was added to the MasterSystemList
+                foreach (var system in MasterSystemList)
+                {
+                    system.InitializeSystem();
+                    // Display results of start call...
+                }
 
                 Initialized = true;
             }
         }
 
+        private void AddSystems()
+        {
+            // Add all of the Systems
+
+            // Each System needs to implement ISystem interface
+            // The order you add the systems is the order in which they will be started.
+            // Make sure to add systems that depend on other sytems AFTER the system they depend on
+
+            // Always add the logger first
+            AddSystem(Logger.Instance);
+
+
+            // Most other Systems depend on the Database, so add it second. 
+            AddSystem(DatabaseManager.Instance);
+
+            // The ClientManager relies on data from the GameManager
+            // You need to add the GameManager before the ClientManager
+            AddSystem(GameManager);
+            AddSystem(ClientManager);
+        }
+
         // Start all Systems 
+        // Called when the Server starts
         public void StartServer()
         {
             // Start each system in the order it was added to the MasterSystemList
@@ -69,12 +89,27 @@ namespace GrindscapeServer.Controller
         }
 
         // Stop all Systems 
+        // Called when the Server stops
         public void StopServer()
         {
             // Stop each system in the reverse order it was added to the MasterSystemList
             foreach (var system in MasterSystemList.Reverse<ISystem>())
             {
                 system.StopSystem();
+                // Display results of stop call...
+            }
+        }
+
+        // Shutdown all Systems
+        // Called when the application stops
+        public void Shutdown()
+        {
+            StopServer();
+
+            // Shutdown each system in the reverse order it was added to the MasterSystemList
+            foreach (var system in MasterSystemList.Reverse<ISystem>())
+            {
+                system.ShutdownSystem();
                 // Display results of stop call...
             }
         }
@@ -108,7 +143,6 @@ namespace GrindscapeServer.Controller
 
             // Add the System Name to the HashSet
             MasterSystemListNames.Add(system.SystemName);
-
         }
 
         public void WaitUntilAllSystemShutdown()

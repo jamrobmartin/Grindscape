@@ -147,7 +147,7 @@ namespace GrindscapeServer.UI
             catch (Exception)
             {
                 // This is to catch the object disposed exception
-                
+
             }
 
 

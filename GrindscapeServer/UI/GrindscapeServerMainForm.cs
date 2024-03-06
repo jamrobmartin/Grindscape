@@ -35,7 +35,7 @@ namespace GrindscapeServer.UI
             Systems.Logger.Instance.UnRegisterMessageLoggedEventHandler(loggerConsole1.WriteLoggedMessagesToLoggerConsole);
 
             // Make the call to stop the server.
-            ServerMasterController.Instance.StopServer();
+            ServerMasterController.Instance.Shutdown();
 
             // Start a task to wait until all Systems are shutdown.
             await Task.Run(() => { ServerMasterController.Instance.WaitUntilAllSystemShutdown(); });

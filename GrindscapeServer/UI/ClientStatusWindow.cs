@@ -189,7 +189,7 @@ namespace GrindscapeServer.UI
             TableLayoutPanel table = GenerateNewTable(isHeader);
             //table.Dock = DockStyle.Fill;
 
-            panel.Controls.Add(table);            
+            panel.Controls.Add(table);
 
             return panel;
         }

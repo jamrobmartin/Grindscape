@@ -36,15 +36,20 @@ namespace GrindscapeServer.Systems
 
         public void InitializeSystem()
         {
-
+            Initialize();
         }
 
         public void StartSystem()
         {
-            Initialize();
+            // This System is always on, so nothing to do on Start/Stop
         }
 
         public void StopSystem()
+        {
+            // This System is always on, so nothing to do on Start/Stop
+        }
+
+        public void ShutdownSystem()
         {
             SystemShutdownEvent.Reset();
             _ = ShutdownAsync();
@@ -164,7 +169,7 @@ namespace GrindscapeServer.Systems
                 if (true)
                 {
                     // First we send 4 test messages that should get displayed on the System Logger
-                    
+
                     Logger.LoggerMessage message1 = new()
                     {
                         Message = "Test!",

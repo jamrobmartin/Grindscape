@@ -10,9 +10,17 @@
 
         ManualResetEvent SystemShutdownEvent { get; }
 
+        // Called when the application Starts
         void InitializeSystem();
+
+        // Called when the Server Starts
         void StartSystem();
+
+        // Called when the Server Stops
         void StopSystem();
+
+        // Called when the application Stops
+        void ShutdownSystem();
 
         void UpdateSystemState();
     }
