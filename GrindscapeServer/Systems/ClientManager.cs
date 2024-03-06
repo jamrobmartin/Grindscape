@@ -49,6 +49,11 @@ namespace GrindscapeServer.Systems
             Stop();
         }
 
+        public void ShutdownSystem()
+        {
+
+        }
+
         public void UpdateSystemState()
         {
             SystemStatus = isRunning ? ESystemStatus.Running : ESystemStatus.Stopped;
